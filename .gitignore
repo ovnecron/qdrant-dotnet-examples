@@ -39,6 +39,7 @@ ScaffoldingReadMe.txt
 # Others
 ~$*
 *~
+.DS_Store
 CodeCoverage/
 
 # MSBuild Binary and Structured Log
@@ -52,3 +53,11 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+
+.docs/
+
+# Local environment files
+.env
+.env.*
+!.env.example

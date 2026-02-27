@@ -1,0 +1,28 @@
+name: security
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore QdrantDotNetExample.sln
+
+      - name: Dependency vulnerability audit
+        run: dotnet list QdrantDotNetExample.sln package --vulnerable --include-transitive
