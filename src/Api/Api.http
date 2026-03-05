@@ -1,0 +1,65 @@
+@Api_HostAddress = http://localhost:5010
+
+GET {{Api_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{Api_HostAddress}}/ready
+Accept: application/json
+
+###
+
+GET {{Api_HostAddress}}/swagger/v1/swagger.json
+Accept: application/json
+
+###
+
+POST {{Api_HostAddress}}/api/v1/admin/collections/init
+Content-Type: application/json
+
+{
+  "collectionName": "knowledge_chunks",
+  "vectorSize": 3,
+  "distance": "Cosine"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/vectors/upsert
+Content-Type: application/json
+
+{
+  "collection": "knowledge_chunks",
+  "points": [
+    {
+      "id": "doc-1:0",
+      "vector": [0.12, -0.09, 0.31],
+      "payload": {
+        "docId": "doc-1",
+        "source": "docs/intro.md",
+        "title": "Introduction",
+        "tags": ["intro", "getting-started"],
+        "content": "Run AppHost and wait until resources are healthy."
+      }
+    }
+  ]
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/vectors/search
+Content-Type: application/json
+
+{
+  "collection": "knowledge_chunks",
+  "queryVector": [0.11, -0.05, 0.27],
+  "topK": 5,
+  "minScore": 0.2,
+  "filter": {
+    "tagsAny": ["getting-started"],
+    "sourceEquals": "docs/intro.md"
+  }
+}
+
+###
