@@ -6,6 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Starter repository for a Qdrant-backed .NET 10 RAG stack with local orchestration via Aspire.
+Repository: https://github.com/ovnecron/qdrant-dotnet-examples
 
 ## Prerequisites
 
@@ -16,7 +17,7 @@ Starter repository for a Qdrant-backed .NET 10 RAG stack with local orchestratio
 ## Quickstart (5-10 minutes)
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ovnecron/qdrant-dotnet-examples.git
 cd qdrant-dotnet-examples
 ```
 
