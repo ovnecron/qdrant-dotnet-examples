@@ -50,14 +50,12 @@ internal sealed class AdminEndpointService : IAdminEndpointService
                 async () =>
                 {
                     var result = await _vectorStoreClient
-                        .InitializeCollectionAsync(definition, cancellationToken)
-                        .ConfigureAwait(false);
+                        .InitializeCollectionAsync(definition, cancellationToken);
 
                     return (
                         Value: _responseMapper.ToResponse(result),
                         IsCreated: result.Created);
                 },
-                unexpectedTitle: "Collection initialization failed")
-            .ConfigureAwait(false);
+                unexpectedTitle: "Collection initialization failed");
     }
 }

@@ -12,8 +12,18 @@ internal sealed record UpsertVectorsCommand(
     string CollectionName,
     IReadOnlyList<VectorRecord> Records);
 
+internal sealed record DeleteVectorsCommand(
+    string CollectionName,
+    IReadOnlyList<string> ChunkIds);
+
 internal interface IVectorRequestParser
 {
+    bool TryParseDeleteRequest(
+        VectorDeleteRequest request,
+        string defaultCollectionName,
+        [NotNullWhen(true)] out DeleteVectorsCommand? command,
+        out Dictionary<string, string[]> errors);
+
     bool TryParseUpsertRequest(
         VectorUpsertRequest request,
         string defaultCollectionName,
@@ -29,6 +39,43 @@ internal interface IVectorRequestParser
 
 internal sealed class VectorRequestParser : IVectorRequestParser
 {
+    public bool TryParseDeleteRequest(
+        VectorDeleteRequest request,
+        string defaultCollectionName,
+        [NotNullWhen(true)] out DeleteVectorsCommand? command,
+        out Dictionary<string, string[]> errors)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        errors = new Dictionary<string, string[]>();
+        command = null;
+
+        var collectionName = ResolveCollectionName(request.Collection, defaultCollectionName);
+        if (string.IsNullOrWhiteSpace(collectionName))
+        {
+            errors["collection"] = ["Collection is required."];
+        }
+
+        var chunkIds = request.ChunkIds
+            .Where(static chunkId => !string.IsNullOrWhiteSpace(chunkId))
+            .Select(chunkId => chunkId.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        if (chunkIds.Length == 0)
+        {
+            errors["chunkIds"] = ["At least one chunk id is required."];
+        }
+
+        if (errors.Count > 0)
+        {
+            return false;
+        }
+
+        command = new DeleteVectorsCommand(collectionName, chunkIds);
+        return true;
+    }
+
     public bool TryParseUpsertRequest(
         VectorUpsertRequest request,
         string defaultCollectionName,

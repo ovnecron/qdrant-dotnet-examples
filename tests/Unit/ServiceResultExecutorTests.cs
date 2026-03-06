@@ -55,6 +55,26 @@ public sealed class ServiceResultExecutorTests
         Assert.Equal("Vector store configuration invalid", result.Failure.Title);
     }
 
+    [Fact]
+    public async Task ExecuteOptionalAsync_ReturnsNotFoundFailure_WhenOperationReturnsNull()
+    {
+        var executor = new ServiceResultExecutor();
+        var missingFailure = new ServiceFailure(
+            ServiceFailureKind.NotFound,
+            "Vector not found",
+            "missing");
+
+        var result = await executor.ExecuteOptionalAsync<DummyResponse>(
+            () => Task.FromResult<DummyResponse?>(null),
+            unexpectedTitle: "unexpected",
+            missingFailure: missingFailure);
+
+        Assert.Null(result.Value);
+        Assert.NotNull(result.Failure);
+        Assert.Equal(ServiceFailureKind.NotFound, result.Failure.Kind);
+        Assert.Equal("Vector not found", result.Failure.Title);
+    }
+
     private sealed class DummyResponse
     {
         public required string Value { get; init; }

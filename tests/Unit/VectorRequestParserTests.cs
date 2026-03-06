@@ -10,6 +10,50 @@ namespace Unit;
 public sealed class VectorRequestParserTests
 {
     [Fact]
+    public void TryParseDeleteRequest_NormalizesAndDeduplicatesChunkIds()
+    {
+        var parser = new VectorRequestParser();
+        var request = new VectorDeleteRequest
+        {
+            Collection = "  knowledge_chunks  ",
+            ChunkIds = [" doc-1:0 ", "doc-1:0", "doc-1:1", "   "]
+        };
+
+        var success = parser.TryParseDeleteRequest(
+            request,
+            defaultCollectionName: "fallback_collection",
+            out var command,
+            out var errors);
+
+        Assert.True(success);
+        Assert.Empty(errors);
+
+        var parsedCommand = Assert.IsType<DeleteVectorsCommand>(command);
+        Assert.Equal("knowledge_chunks", parsedCommand.CollectionName);
+        Assert.Equal(["doc-1:0", "doc-1:1"], parsedCommand.ChunkIds);
+    }
+
+    [Fact]
+    public void TryParseDeleteRequest_ReturnsValidationError_WhenChunkIdsMissing()
+    {
+        var parser = new VectorRequestParser();
+        var request = new VectorDeleteRequest
+        {
+            Collection = "knowledge_chunks",
+            ChunkIds = []
+        };
+
+        var success = parser.TryParseDeleteRequest(
+            request,
+            defaultCollectionName: "knowledge_chunks",
+            out _,
+            out var errors);
+
+        Assert.False(success);
+        Assert.True(errors.ContainsKey("chunkIds"));
+    }
+
+    [Fact]
     public void TryParseUpsertRequest_ReturnsValidationError_WhenPointsMissing()
     {
         var parser = new VectorRequestParser();

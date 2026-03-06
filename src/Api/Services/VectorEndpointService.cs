@@ -33,6 +33,71 @@ internal sealed class VectorEndpointService : IVectorEndpointService
         _resultExecutor = resultExecutor ?? throw new ArgumentNullException(nameof(resultExecutor));
     }
 
+    public async Task<ServiceResult<VectorDeleteResponse>> DeleteAsync(
+        VectorDeleteRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!_requestParser.TryParseDeleteRequest(
+                request,
+                _defaultCollectionName,
+                out var command,
+                out var errors))
+        {
+            return ServiceResult<VectorDeleteResponse>.Validation(errors);
+        }
+
+        return await _resultExecutor.ExecuteAsync(
+                async () =>
+                {
+                    var deletedCount = await _vectorStoreClient
+                        .DeleteAsync(command.CollectionName, command.ChunkIds, cancellationToken);
+
+                    return _responseMapper.ToDeleteResponse(command.CollectionName, deletedCount);
+                },
+                unexpectedTitle: "Vector delete failed");
+    }
+
+    public Task<ServiceResult<VectorRecordResponse>> GetByIdAsync(
+        string collectionName,
+        string chunkId,
+        CancellationToken cancellationToken)
+    {
+        var resolvedCollectionName = collectionName?.Trim() ?? string.Empty;
+        var resolvedChunkId = chunkId?.Trim() ?? string.Empty;
+        var errors = new Dictionary<string, string[]>();
+
+        if (string.IsNullOrWhiteSpace(resolvedCollectionName))
+        {
+            errors["collection"] = ["Collection is required."];
+        }
+
+        if (string.IsNullOrWhiteSpace(resolvedChunkId))
+        {
+            errors["chunkId"] = ["Chunk id is required."];
+        }
+
+        if (errors.Count > 0)
+        {
+            return Task.FromResult(ServiceResult<VectorRecordResponse>.Validation(errors));
+        }
+
+        return _resultExecutor.ExecuteOptionalAsync(
+            async () =>
+            {
+                var record = await _vectorStoreClient
+                    .GetByIdAsync(resolvedCollectionName, resolvedChunkId, cancellationToken);
+
+                return record is null
+                    ? null
+                    : _responseMapper.ToRecordResponse(resolvedCollectionName, record);
+            },
+            unexpectedTitle: "Vector retrieval failed",
+            missingFailure: new ServiceFailure(
+                ServiceFailureKind.NotFound,
+                "Vector not found",
+                $"No vector with chunk id '{resolvedChunkId}' exists in collection '{resolvedCollectionName}'."));
+    }
+
     public async Task<ServiceResult<VectorUpsertResponse>> UpsertAsync(
         VectorUpsertRequest request,
         CancellationToken cancellationToken)
@@ -50,8 +115,7 @@ internal sealed class VectorEndpointService : IVectorEndpointService
                 async () =>
                 {
                     await _vectorStoreClient
-                        .UpsertAsync(command.CollectionName, command.Records, cancellationToken)
-                        .ConfigureAwait(false);
+                        .UpsertAsync(command.CollectionName, command.Records, cancellationToken);
 
                     return (
                         Value: _responseMapper.ToUpsertResponse(
@@ -59,8 +123,7 @@ internal sealed class VectorEndpointService : IVectorEndpointService
                             command.Records.Count),
                         IsCreated: true);
                 },
-                unexpectedTitle: "Vector upsert failed")
-            .ConfigureAwait(false);
+                unexpectedTitle: "Vector upsert failed");
     }
 
     public async Task<ServiceResult<VectorSearchResponse>> SearchAsync(
@@ -81,12 +144,10 @@ internal sealed class VectorEndpointService : IVectorEndpointService
                 async () =>
                 {
                     var hits = await _vectorStoreClient
-                        .SearchAsync(searchRequest, cancellationToken)
-                        .ConfigureAwait(false);
+                        .SearchAsync(searchRequest, cancellationToken);
 
                     return _responseMapper.ToSearchResponse(traceId, hits);
                 },
-                unexpectedTitle: "Vector search failed")
-            .ConfigureAwait(false);
+                unexpectedTitle: "Vector search failed");
     }
 }

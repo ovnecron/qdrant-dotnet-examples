@@ -28,8 +28,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken)
     {
         var result = await adminEndpointService
-            .InitializeCollectionAsync(request, cancellationToken)
-            .ConfigureAwait(false);
+            .InitializeCollectionAsync(request, cancellationToken);
 
         return ServiceResultMapper.ToHttpResult(
             result,

@@ -29,7 +29,7 @@ public sealed class ApiIntegrationFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _qdrantContainer.StartAsync().ConfigureAwait(false);
+        await _qdrantContainer.StartAsync();
 
         var restEndpoint = _qdrantContainer.GetHttpConnectionString();
         var grpcEndpoint = _qdrantContainer.GetGrpcConnectionString();
@@ -58,7 +58,7 @@ public sealed class ApiIntegrationFixture : IAsyncLifetime
         _apiFactory?.Dispose();
         if (_qdrantContainer is not null)
         {
-            await _qdrantContainer.DisposeAsync().ConfigureAwait(false);
+            await _qdrantContainer.DisposeAsync();
         }
     }
 }

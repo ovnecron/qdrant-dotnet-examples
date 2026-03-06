@@ -55,8 +55,7 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
         }
 
         var collectionExists = await _client
-            .CollectionExistsAsync(definition.Name, cancellationToken)
-            .ConfigureAwait(false);
+            .CollectionExistsAsync(definition.Name, cancellationToken);
 
         if (!collectionExists)
         {
@@ -67,15 +66,13 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
                         Size = checked((ulong)definition.VectorSize),
                         Distance = MapDistance(definition.Distance)
                     },
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+                    cancellationToken: cancellationToken);
         }
 
         await EnsurePayloadIndexesAsync(
                 definition.Name,
                 definition.PayloadIndexes,
-                cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken);
 
         return new CollectionInitResult
         {
@@ -105,8 +102,7 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
                 collectionName,
                 points,
                 wait: true,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken: cancellationToken);
     }
 
     public async Task<IReadOnlyList<SearchResult>> SearchAsync(
@@ -139,8 +135,7 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
                 payloadSelector: true,
                 vectorsSelector: false,
                 scoreThreshold: request.MinScore,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken: cancellationToken);
 
         return hits
             .Select(QdrantPayloadMapper.MapSearchResult)
@@ -166,11 +161,52 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
                 pointId,
                 withPayload: true,
                 withVectors: true,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken: cancellationToken);
 
         var point = points.FirstOrDefault();
         return point is null ? null : QdrantPayloadMapper.MapVectorRecord(point, chunkId);
+    }
+
+    public async Task<int> DeleteAsync(
+        string collectionName,
+        IReadOnlyCollection<string> chunkIds,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateCollectionName(collectionName, nameof(collectionName));
+        ArgumentNullException.ThrowIfNull(chunkIds);
+
+        var pointIds = chunkIds
+            .Where(static chunkId => !string.IsNullOrWhiteSpace(chunkId))
+            .Select(chunkId => chunkId.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .Select(QdrantPointIdConverter.ToPointId)
+            .ToArray();
+
+        if (pointIds.Length == 0)
+        {
+            return 0;
+        }
+
+        var existingPoints = await _client
+            .RetrieveAsync(
+                collectionName,
+                pointIds,
+                withPayload: false,
+                withVectors: false,
+                cancellationToken: cancellationToken);
+
+        if (existingPoints.Count == 0)
+        {
+            return 0;
+        }
+
+        await _client.DeleteAsync(
+                collectionName,
+                pointIds,
+                wait: true,
+                cancellationToken: cancellationToken);
+
+        return existingPoints.Count;
     }
 
     private async Task EnsurePayloadIndexesAsync(
@@ -197,8 +233,7 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
                         indexName,
                         ResolvePayloadSchemaType(indexName),
                         wait: true,
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+                        cancellationToken: cancellationToken);
             }
             catch (Exception exception) when (IsAlreadyExistsError(exception))
             {

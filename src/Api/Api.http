@@ -63,3 +63,18 @@ Content-Type: application/json
 }
 
 ###
+
+GET {{Api_HostAddress}}/api/v1/vectors/knowledge_chunks/doc-1:0
+Accept: application/json
+
+###
+
+DELETE {{Api_HostAddress}}/api/v1/vectors
+Content-Type: application/json
+
+{
+  "collection": "knowledge_chunks",
+  "chunkIds": ["doc-1:0", "doc-1:1"]
+}
+
+###

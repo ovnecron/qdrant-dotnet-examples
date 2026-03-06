@@ -45,8 +45,7 @@ public sealed class QdrantConfigurationHealthCheck : IHealthCheck
         {
             var client = new QdrantClient(grpcEndpoint, _qdrantOptions.ApiKey, timeout);
             _ = await client
-                .CollectionExistsAsync("__readiness_probe__", cancellationToken)
-                .ConfigureAwait(false);
+                .CollectionExistsAsync("__readiness_probe__", cancellationToken);
 
             return HealthCheckResult.Healthy();
         }

@@ -9,6 +9,12 @@ internal interface IServiceResultExecutor
         string unexpectedTitle)
         where TValue : class;
 
+    Task<ServiceResult<TValue>> ExecuteOptionalAsync<TValue>(
+        Func<Task<TValue?>> operation,
+        string unexpectedTitle,
+        ServiceFailure missingFailure)
+        where TValue : class;
+
     Task<ServiceResult<TValue>> ExecuteAsync<TValue>(
         Func<Task<(TValue Value, bool IsCreated)>> operation,
         string unexpectedTitle)
@@ -27,7 +33,7 @@ internal sealed class ServiceResultExecutor : IServiceResultExecutor
         return ExecuteAsync(
             async () =>
             {
-                var value = await operation().ConfigureAwait(false);
+                var value = await operation();
                 return (Value: value, IsCreated: false);
             },
             unexpectedTitle);
@@ -42,33 +48,60 @@ internal sealed class ServiceResultExecutor : IServiceResultExecutor
 
         try
         {
-            var outcome = await operation().ConfigureAwait(false);
+            var outcome = await operation();
             return ServiceResult<TValue>.Success(outcome.Value, outcome.IsCreated);
-        }
-        catch (RpcException exception) when (
-            exception.StatusCode is StatusCode.Unavailable or StatusCode.DeadlineExceeded)
-        {
-            return ServiceResult<TValue>.Failed(
-                new ServiceFailure(
-                    ServiceFailureKind.VectorStoreUnavailable,
-                    "Vector store unavailable",
-                    exception.Status.Detail));
-        }
-        catch (InvalidOperationException exception)
-        {
-            return ServiceResult<TValue>.Failed(
-                new ServiceFailure(
-                    ServiceFailureKind.ConfigurationInvalid,
-                    "Vector store configuration invalid",
-                    exception.Message));
         }
         catch (Exception exception)
         {
-            return ServiceResult<TValue>.Failed(
-                new ServiceFailure(
-                    ServiceFailureKind.Unexpected,
-                    unexpectedTitle,
-                    exception.Message));
+            return MapException<TValue>(exception, unexpectedTitle);
         }
+    }
+
+    public async Task<ServiceResult<TValue>> ExecuteOptionalAsync<TValue>(
+        Func<Task<TValue?>> operation,
+        string unexpectedTitle,
+        ServiceFailure missingFailure)
+        where TValue : class
+    {
+        ArgumentNullException.ThrowIfNull(operation);
+        ArgumentNullException.ThrowIfNull(missingFailure);
+
+        try
+        {
+            var value = await operation();
+            return value is null
+                ? ServiceResult<TValue>.Failed(missingFailure)
+                : ServiceResult<TValue>.Success(value);
+        }
+        catch (Exception exception)
+        {
+            return MapException<TValue>(exception, unexpectedTitle);
+        }
+    }
+
+    private static ServiceResult<TValue> MapException<TValue>(Exception exception, string unexpectedTitle)
+        where TValue : class
+    {
+        return exception switch
+        {
+            RpcException rpcException when rpcException.StatusCode is StatusCode.Unavailable or StatusCode.DeadlineExceeded =>
+                ServiceResult<TValue>.Failed(
+                    new ServiceFailure(
+                        ServiceFailureKind.VectorStoreUnavailable,
+                        "Vector store unavailable",
+                        rpcException.Status.Detail)),
+            InvalidOperationException invalidOperationException =>
+                ServiceResult<TValue>.Failed(
+                    new ServiceFailure(
+                        ServiceFailureKind.ConfigurationInvalid,
+                        "Vector store configuration invalid",
+                        invalidOperationException.Message)),
+            _ =>
+                ServiceResult<TValue>.Failed(
+                    new ServiceFailure(
+                        ServiceFailureKind.Unexpected,
+                        unexpectedTitle,
+                        exception.Message))
+        };
     }
 }

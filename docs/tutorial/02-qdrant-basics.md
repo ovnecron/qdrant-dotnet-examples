@@ -1,6 +1,6 @@
 # Tutorial 02: Qdrant Basics
 
-This tutorial covers collection init, vector upsert, vector search, and validation behavior via the API.
+This tutorial covers collection init, vector upsert, vector search, vector deletion, vector retrieval by id, and validation behavior via the API.
 
 ## Prerequisites
 
@@ -72,7 +72,36 @@ Expected:
 - `200 OK`
 - response contains filtered hits (for example `doc-1:0`)
 
-## 4) Validation Errors
+## 4) Fetch Vector by Id
+
+```bash
+curl -i "$API_BASE_URL/api/v1/vectors/knowledge_chunks/doc-1:0"
+```
+
+Expected:
+
+- `200 OK`
+- response includes full stored vector record including payload fields
+- when the collection uses `Cosine`, Qdrant returns the normalized vector values
+
+## 5) Delete Vectors by Chunk Id
+
+```bash
+curl -i -X DELETE "$API_BASE_URL/api/v1/vectors" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "collection":"knowledge_chunks",
+    "chunkIds":["doc-1:0","doc-1:1"]
+  }'
+```
+
+Expected:
+
+- `200 OK`
+- `deletedCount` equals the number of existing unique chunk ids that were removed
+- unknown chunk ids are ignored and do not fail the request
+
+## 6) Validation Errors
 
 Collection init with invalid vector size:
 
