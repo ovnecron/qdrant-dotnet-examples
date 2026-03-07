@@ -2,6 +2,7 @@ using Api.Endpoints;
 using Api.HealthChecks;
 using Api.Options;
 using Api.Services;
+using Api.Services.Ingestion;
 using Api.Services.Mappers;
 using Api.Services.Results;
 using Api.Services.Validation;
@@ -23,6 +24,7 @@ builder.Services
 builder.Services.AddQdrantVectorStore();
 builder.Services.AddSingleton<IAdminRequestParser, AdminRequestParser>();
 builder.Services.AddSingleton<IVectorRequestParser, VectorRequestParser>();
+builder.Services.AddSingleton<IMarkdownChunker, MarkdownChunker>();
 builder.Services.AddSingleton<IAdminResponseMapper, AdminResponseMapper>();
 builder.Services.AddSingleton<IVectorResponseMapper, VectorResponseMapper>();
 builder.Services.AddSingleton<IServiceResultExecutor, ServiceResultExecutor>();
