@@ -81,6 +81,9 @@ Notes:
 
 - `.env.example` contains local environment defaults and optional overrides (no secrets).
 - Markdown ingestion uses the configured embedding dimension (default: `384`), so ingest collections must be initialized with the same vector size.
+- `Embedding:Provider=Deterministic` is the default for tests, CI, and zero-secret local runs.
+- `Embedding:Provider=Ollama` is supported for local real embeddings via `http://localhost:11434/api`.
+- When using Ollama, set `Embedding:Model` and `Embedding:Dimension` to the actual embedding model you run locally, then initialize Qdrant collections with the same vector size.
 - If no endpoint is configured, the Qdrant gRPC client falls back to `http://localhost:6334`.
 - If you set a custom REST endpoint port, set `QDRANT__ENDPOINT_GRPC` explicitly.
 - Qdrant container image is pinned to `qdrant/qdrant:v1.17.0`. Override with `QDRANT_CONTAINER_IMAGE=<repository:tag>` in AppHost and integration tests.
@@ -90,6 +93,15 @@ Notes:
 ```bash
 dotnet user-secrets init --project src/Api
 dotnet user-secrets set --project src/Api "Qdrant:ApiKey" "<secret>"
+```
+
+Example local Ollama override:
+
+```bash
+dotnet user-secrets set --project src/Api "Embedding:Provider" "Ollama"
+dotnet user-secrets set --project src/Api "Embedding:Model" "<your-ollama-embedding-model>"
+dotnet user-secrets set --project src/Api "Embedding:Dimension" "<your-model-dimension>"
+dotnet user-secrets set --project src/Api "Embedding:BaseUrl" "http://localhost:11434/api"
 ```
 
 ## CI

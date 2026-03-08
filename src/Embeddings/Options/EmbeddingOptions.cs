@@ -13,4 +13,12 @@ public sealed class EmbeddingOptions
     public int BatchSize { get; set; } = 16;
 
     public string SchemaVersion { get; set; } = "v1";
+
+    public string? BaseUrl { get; set; } = "http://localhost:11434/api";
+
+    public string? ApiKey { get; set; }
+
+    public string? ApiVersion { get; set; }
+
+    public string? DeploymentName { get; set; }
 }

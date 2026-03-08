@@ -31,7 +31,7 @@ builder.Services
     .AddOptions<QdrantOptions>()
     .Bind(builder.Configuration.GetSection(QdrantOptions.SectionName))
     .ValidateOnStart();
-builder.Services.AddSingleton<ITextEmbeddingClient, DeterministicTextEmbeddingClient>();
+builder.Services.AddConfiguredTextEmbeddingClient();
 builder.Services.AddQdrantVectorStore();
 builder.Services.AddSingleton<IAdminRequestParser, AdminRequestParser>();
 builder.Services.AddSingleton<IMarkdownIngestRequestParser, MarkdownIngestRequestParser>();

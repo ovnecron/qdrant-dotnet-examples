@@ -108,3 +108,21 @@ The goal is not to prove production retrieval quality. The goal is to catch regr
 - vector search behavior
 
 The current guard evaluates `Recall@3` against a fixed local fixture dataset.
+
+## Optional: Switch to Local Ollama Embeddings
+
+The default provider is deterministic so that local runs, tests, and CI do not require an external model runtime.
+
+If you want to use a real local embedding model with Ollama instead:
+
+```bash
+dotnet user-secrets set --project src/Api "Embedding:Provider" "Ollama"
+dotnet user-secrets set --project src/Api "Embedding:Model" "<your-ollama-embedding-model>"
+dotnet user-secrets set --project src/Api "Embedding:Dimension" "<your-model-dimension>"
+dotnet user-secrets set --project src/Api "Embedding:BaseUrl" "http://localhost:11434/api"
+```
+
+Important:
+
+- the Ollama model dimension must match the Qdrant collection vector size
+- if you change provider/model/dimension meaningfully, treat that as a new embedding schema and re-ingest into a compatible collection

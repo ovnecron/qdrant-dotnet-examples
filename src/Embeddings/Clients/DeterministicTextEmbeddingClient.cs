@@ -56,8 +56,13 @@ public sealed class DeterministicTextEmbeddingClient : ITextEmbeddingClient
         return Task.FromResult<IReadOnlyList<TextEmbeddingResult>>(results);
     }
 
-    public static bool SupportsProvider(string provider)
+    public static bool SupportsProvider(string? provider)
     {
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            return false;
+        }
+
         return provider.Equals(ProviderName, StringComparison.OrdinalIgnoreCase) ||
                provider.Equals(LegacyProviderAlias, StringComparison.OrdinalIgnoreCase);
     }
