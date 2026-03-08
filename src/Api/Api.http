@@ -1,4 +1,6 @@
 @Api_HostAddress = http://localhost:5010
+@IngestCollection = knowledge_chunks_ingest
+@IngestJobId = replace-me
 
 GET {{Api_HostAddress}}/health
 Accept: application/json
@@ -76,5 +78,36 @@ Content-Type: application/json
   "collection": "knowledge_chunks",
   "chunkIds": ["doc-1:0", "doc-1:1"]
 }
+
+###
+
+POST {{Api_HostAddress}}/api/v1/admin/collections/init
+Content-Type: application/json
+
+{
+  "collectionName": "{{IngestCollection}}",
+  "vectorSize": 384,
+  "distance": "Cosine"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/ingest/markdown
+Content-Type: application/json
+
+{
+  "collection": "{{IngestCollection}}",
+  "docId": "guide-local-run",
+  "sourceId": "docs/local-run.md",
+  "title": "Local Run",
+  "markdown": "# Local Run\n\nRun AppHost and wait until resources are healthy.",
+  "tags": ["tutorial", "local"],
+  "tenantId": "tenant-a"
+}
+
+###
+
+GET {{Api_HostAddress}}/api/v1/ingest/jobs/{{IngestJobId}}
+Accept: application/json
 
 ###

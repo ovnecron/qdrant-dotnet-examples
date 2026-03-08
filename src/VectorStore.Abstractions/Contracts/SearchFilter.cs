@@ -10,6 +10,8 @@ public sealed record SearchFilter
 
     public string? TenantIdEquals { get; init; }
 
+    public bool TenantIdIsNull { get; init; }
+
     public DateTimeOffset? UpdatedAtUtcFrom { get; init; }
 
     public DateTimeOffset? UpdatedAtUtcTo { get; init; }

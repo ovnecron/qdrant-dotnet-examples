@@ -36,6 +36,7 @@ public sealed class VectorResponseMapperTests
             CreatedAtUtc = DateTimeOffset.Parse("2026-03-06T09:15:00+00:00"),
             UpdatedAtUtc = DateTimeOffset.Parse("2026-03-06T09:20:00+00:00"),
             TenantId = "tenant-a",
+            DocVersion = "doc-version-1",
             EmbeddingSchemaVersion = "v1"
         };
 
@@ -54,6 +55,7 @@ public sealed class VectorResponseMapperTests
         Assert.Equal(DateTimeOffset.Parse("2026-03-06T09:15:00+00:00"), response.CreatedAtUtc);
         Assert.Equal(DateTimeOffset.Parse("2026-03-06T09:20:00+00:00"), response.UpdatedAtUtc);
         Assert.Equal("tenant-a", response.TenantId);
+        Assert.Equal("doc-version-1", response.DocVersion);
         Assert.Equal("v1", response.EmbeddingSchemaVersion);
     }
 }

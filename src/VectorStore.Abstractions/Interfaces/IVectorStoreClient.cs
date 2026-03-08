@@ -26,4 +26,9 @@ public interface IVectorStoreClient
         string collectionName,
         IReadOnlyCollection<string> chunkIds,
         CancellationToken cancellationToken = default);
+
+    Task DeleteByFilterAsync(
+        string collectionName,
+        SearchFilter filter,
+        CancellationToken cancellationToken = default);
 }

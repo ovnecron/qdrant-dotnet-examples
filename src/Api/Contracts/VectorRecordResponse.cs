@@ -28,5 +28,7 @@ public sealed record VectorRecordResponse
 
     public string? TenantId { get; init; }
 
+    public string? DocVersion { get; init; }
+
     public string? EmbeddingSchemaVersion { get; init; }
 }

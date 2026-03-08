@@ -57,6 +57,11 @@ internal static class QdrantPayloadMapper
             point.Payload["tenantId"] = record.TenantId;
         }
 
+        if (!string.IsNullOrWhiteSpace(record.DocVersion))
+        {
+            point.Payload["docVersion"] = record.DocVersion;
+        }
+
         if (!string.IsNullOrWhiteSpace(record.EmbeddingSchemaVersion))
         {
             point.Payload["embeddingSchemaVersion"] = record.EmbeddingSchemaVersion;
@@ -112,6 +117,7 @@ internal static class QdrantPayloadMapper
             CreatedAtUtc = createdAtUtc,
             UpdatedAtUtc = updatedAtUtc,
             TenantId = GetPayloadString(payload, "tenantId"),
+            DocVersion = GetPayloadString(payload, "docVersion"),
             EmbeddingSchemaVersion = GetPayloadString(payload, "embeddingSchemaVersion")
         };
     }

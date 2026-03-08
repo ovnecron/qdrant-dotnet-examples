@@ -42,6 +42,7 @@ dotnet run --project src/AppHost
 
 - `docs/tutorial/01-local-run.md`
 - `docs/tutorial/02-qdrant-basics.md`
+- `docs/tutorial/03-markdown-ingestion.md`
 
 ## Verify Local Runtime
 
@@ -78,6 +79,7 @@ Notes:
 ## Configuration
 
 - `.env.example` contains local environment defaults and optional overrides (no secrets).
+- Markdown ingestion uses the configured embedding dimension (default: `384`), so ingest collections must be initialized with the same vector size.
 - If no endpoint is configured, the Qdrant gRPC client falls back to `http://localhost:6334`.
 - If you set a custom REST endpoint port, set `QDRANT__ENDPOINT_GRPC` explicitly.
 - Qdrant container image is pinned to `qdrant/qdrant:v1.17.0`. Override with `QDRANT_CONTAINER_IMAGE=<repository:tag>` in AppHost and integration tests.

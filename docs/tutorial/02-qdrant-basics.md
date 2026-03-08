@@ -2,6 +2,8 @@
 
 This tutorial covers collection init, vector upsert, vector search, vector deletion, vector retrieval by id, and validation behavior via the API.
 
+It uses manual 3-dimensional vectors. The markdown ingestion flow in Tutorial 03 uses the configured embedding dimension instead (default: `384`) and should use a separate collection or a freshly initialized default collection.
+
 ## Prerequisites
 
 - Local stack is running (`dotnet run --project src/AppHost`)

@@ -209,6 +209,27 @@ public sealed class QdrantVectorStoreClient : IVectorStoreClient
         return existingPoints.Count;
     }
 
+    public async Task DeleteByFilterAsync(
+        string collectionName,
+        SearchFilter filter,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateCollectionName(collectionName, nameof(collectionName));
+        ArgumentNullException.ThrowIfNull(filter);
+
+        var qdrantFilter = QdrantSearchFilterMapper.BuildFilter(filter);
+        if (qdrantFilter is null)
+        {
+            return;
+        }
+
+        await _client.DeleteAsync(
+            collectionName,
+            qdrantFilter,
+            wait: true,
+            cancellationToken: cancellationToken);
+    }
+
     private async Task EnsurePayloadIndexesAsync(
         string collectionName,
         IReadOnlyList<string> payloadIndexes,

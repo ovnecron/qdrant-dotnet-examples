@@ -28,6 +28,10 @@ internal static class QdrantSearchFilterMapper
         {
             conditions.Add(MatchKeyword("tenantId", filter.TenantIdEquals));
         }
+        else if (filter.TenantIdIsNull)
+        {
+            conditions.Add(IsNull("tenantId"));
+        }
 
         if (filter.TagsAny.Count > 0)
         {

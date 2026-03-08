@@ -53,6 +53,7 @@ internal sealed class VectorResponseMapper : IVectorResponseMapper
             CreatedAtUtc = record.CreatedAtUtc,
             UpdatedAtUtc = record.UpdatedAtUtc,
             TenantId = record.TenantId,
+            DocVersion = record.DocVersion,
             EmbeddingSchemaVersion = record.EmbeddingSchemaVersion
         };
     }
