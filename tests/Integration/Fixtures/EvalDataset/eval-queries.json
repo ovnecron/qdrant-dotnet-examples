@@ -1,0 +1,27 @@
+[
+  {
+    "id": "local-health",
+    "queryText": "How can I verify that the local stack is healthy?",
+    "expectedDocIds": ["eval-local-run"]
+  },
+  {
+    "id": "init-idempotent",
+    "queryText": "Which endpoint initializes a collection and what happens when I call it again?",
+    "expectedDocIds": ["eval-collection-init"]
+  },
+  {
+    "id": "search-filters",
+    "queryText": "Which search parameters limit hits and apply filters?",
+    "expectedDocIds": ["eval-vector-search"]
+  },
+  {
+    "id": "ingest-job-status",
+    "queryText": "How do I check the status of a background markdown ingestion job?",
+    "expectedDocIds": ["eval-markdown-ingestion"]
+  },
+  {
+    "id": "embedding-defaults",
+    "queryText": "Which embedding model, dimension, and schema version are used by default?",
+    "expectedDocIds": ["eval-embedding-config"]
+  }
+]

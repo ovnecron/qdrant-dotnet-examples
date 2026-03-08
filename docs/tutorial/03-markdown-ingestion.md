@@ -95,3 +95,16 @@ That means:
 - `202 Accepted` is a real background workflow, not a fake synchronous response
 - queued and running jobs are lost if the API process restarts
 - this is suitable for local learning and iteration, but not yet a durable production ingestion pipeline
+
+## Eval-lite Retrieval Guard
+
+Integration tests include a small eval-lite dataset with deterministic embeddings.
+
+The goal is not to prove production retrieval quality. The goal is to catch regressions in:
+
+- chunking
+- embedding text preparation
+- ingestion
+- vector search behavior
+
+The current guard evaluates `Recall@3` against a fixed local fixture dataset.

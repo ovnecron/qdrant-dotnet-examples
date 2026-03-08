@@ -75,6 +75,7 @@ Notes:
 
 - `tests/Unit` runs fast and does not require Docker.
 - `tests/Integration` requires Docker (Qdrant testcontainer).
+- `tests/Integration` also includes a deterministic eval-lite retrieval regression check (`Recall@3`) against a small fixed dataset.
 
 ## Configuration
 

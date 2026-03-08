@@ -28,4 +28,10 @@
     <Compile Include="..\..\src\Common\QdrantContainerImage.cs" Link="Common\QdrantContainerImage.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Fixtures\EvalDataset\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
