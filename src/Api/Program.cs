@@ -7,6 +7,10 @@ using Api.Services.Mappers;
 using Api.Services.Results;
 using Api.Services.Validation;
 
+using Embeddings.Clients;
+using Embeddings.Interfaces;
+using Embeddings.Options;
+
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
@@ -16,11 +20,17 @@ using VectorStore.Qdrant.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi("v1");
+builder.Services.AddSingleton<IValidateOptions<EmbeddingOptions>, EmbeddingOptionsValidator>();
 builder.Services.AddSingleton<IValidateOptions<QdrantOptions>, QdrantOptionsValidator>();
+builder.Services
+    .AddOptions<EmbeddingOptions>()
+    .Bind(builder.Configuration.GetSection(EmbeddingOptions.SectionName))
+    .ValidateOnStart();
 builder.Services
     .AddOptions<QdrantOptions>()
     .Bind(builder.Configuration.GetSection(QdrantOptions.SectionName))
     .ValidateOnStart();
+builder.Services.AddSingleton<ITextEmbeddingClient, DeterministicTextEmbeddingClient>();
 builder.Services.AddQdrantVectorStore();
 builder.Services.AddSingleton<IAdminRequestParser, AdminRequestParser>();
 builder.Services.AddSingleton<IVectorRequestParser, VectorRequestParser>();

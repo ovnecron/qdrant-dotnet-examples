@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Api\Api.csproj" />
+    <ProjectReference Include="..\..\src\Embeddings\Embeddings.csproj" />
     <ProjectReference Include="..\..\src\VectorStore.Qdrant\VectorStore.Qdrant.csproj" />
   </ItemGroup>
 

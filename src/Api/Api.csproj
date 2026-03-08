@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Embeddings\Embeddings.csproj" />
     <ProjectReference Include="..\VectorStore.Abstractions\VectorStore.Abstractions.csproj" />
     <ProjectReference Include="..\VectorStore.Qdrant\VectorStore.Qdrant.csproj" />
   </ItemGroup>
