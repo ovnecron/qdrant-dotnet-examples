@@ -111,3 +111,17 @@ GET {{Api_HostAddress}}/api/v1/ingest/jobs/{{IngestJobId}}
 Accept: application/json
 
 ###
+
+POST {{Api_HostAddress}}/api/v1/search/query
+Content-Type: application/json
+
+{
+  "collection": "{{IngestCollection}}",
+  "queryText": "How do I run this locally?",
+  "topK": 3,
+  "filter": {
+    "tenantIdEquals": "tenant-a"
+  }
+}
+
+###

@@ -166,7 +166,7 @@ internal sealed class VectorRequestParser : IVectorRequestParser
             QueryVector = queryVector.ToArray(),
             TopK = request.TopK,
             MinScore = request.MinScore,
-            Filter = MapFilter(request.Filter)
+            Filter = SearchFilterRequestMapper.Map(request.Filter)
         };
 
         return true;
@@ -279,28 +279,6 @@ internal sealed class VectorRequestParser : IVectorRequestParser
         };
 
         return true;
-    }
-
-    private static SearchFilter MapFilter(VectorSearchFilterRequest? filter)
-    {
-        if (filter is null)
-        {
-            return new SearchFilter();
-        }
-
-        return new SearchFilter
-        {
-            DocIdEquals = string.IsNullOrWhiteSpace(filter.DocIdEquals) ? null : filter.DocIdEquals.Trim(),
-            SourceEquals = string.IsNullOrWhiteSpace(filter.SourceEquals) ? null : filter.SourceEquals.Trim(),
-            TagsAny = filter.TagsAny
-                .Where(static tag => !string.IsNullOrWhiteSpace(tag))
-                .Select(tag => tag.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray(),
-            TenantIdEquals = string.IsNullOrWhiteSpace(filter.TenantIdEquals) ? null : filter.TenantIdEquals.Trim(),
-            UpdatedAtUtcFrom = filter.UpdatedAtUtcFrom,
-            UpdatedAtUtcTo = filter.UpdatedAtUtcTo
-        };
     }
 
     private static string ResolveCollectionName(string? requestedCollection, string defaultCollectionName)

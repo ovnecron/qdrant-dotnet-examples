@@ -4,13 +4,7 @@ using System.Text.Json;
 
 using Api.Contracts;
 
-using Embeddings.Clients;
-using Embeddings.Contracts;
-using Embeddings.Options;
-
 using Integration.Fixtures;
-
-using Microsoft.Extensions.Options;
 
 namespace Integration.Qdrant;
 
@@ -48,13 +42,12 @@ public sealed class EvalLiteIntegrationTests
 
         foreach (var query in queries)
         {
-            var queryVector = await CreateQueryVectorAsync(query.QueryText);
             var searchResponse = await client.PostAsJsonAsync(
-                "/api/v1/vectors/search",
-                new VectorSearchRequest
+                "/api/v1/search/query",
+                new SemanticSearchQueryRequest
                 {
                     Collection = collectionName,
-                    QueryVector = queryVector,
+                    QueryText = query.QueryText,
                     TopK = 3,
                     Filter = new VectorSearchFilterRequest
                     {
@@ -64,7 +57,7 @@ public sealed class EvalLiteIntegrationTests
 
             Assert.Equal(HttpStatusCode.OK, searchResponse.StatusCode);
 
-            var searchPayload = await searchResponse.Content.ReadFromJsonAsync<VectorSearchResponse>();
+            var searchPayload = await searchResponse.Content.ReadFromJsonAsync<SemanticSearchQueryResponse>();
             Assert.NotNull(searchPayload);
 
             var actualDocIds = await ResolveDocIdsAsync(client, collectionName, searchPayload.Hits);
@@ -195,7 +188,7 @@ public sealed class EvalLiteIntegrationTests
     private static async Task<IReadOnlyList<string>> ResolveDocIdsAsync(
         HttpClient client,
         string collectionName,
-        IReadOnlyList<VectorSearchHitResponse> hits)
+        IReadOnlyList<SemanticSearchHitResponse> hits)
     {
         var docIds = new List<string>(hits.Count);
 
@@ -213,29 +206,6 @@ public sealed class EvalLiteIntegrationTests
         return docIds
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-    }
-
-    private static async Task<IReadOnlyList<float>> CreateQueryVectorAsync(string text)
-    {
-        var client = new DeterministicTextEmbeddingClient(
-            Options.Create(
-                new EmbeddingOptions
-                {
-                    Provider = DeterministicTextEmbeddingClient.ProviderName,
-                    Model = "hashing-text-v1",
-                    Dimension = 384,
-                    BatchSize = 16,
-                    SchemaVersion = "v1"
-                }));
-
-        var result = await client.EmbedAsync(
-            new TextEmbeddingRequest
-            {
-                Text = text,
-                Kind = EmbeddingKind.Query
-            });
-
-        return result.Vector;
     }
 
     private static string BuildFailureMessage(double recallAt3, IReadOnlyList<EvalQueryResult> results)
