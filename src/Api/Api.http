@@ -125,3 +125,19 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{Api_HostAddress}}/api/v1/rag/query
+Content-Type: application/json
+
+{
+  "collection": "{{IngestCollection}}",
+  "question": "How do I check health and ready endpoints locally?",
+  "topK": 3,
+  "includeDebug": true,
+  "filter": {
+    "tenantIdEquals": "tenant-a",
+    "tagsAny": ["local"]
+  }
+}
+
+###

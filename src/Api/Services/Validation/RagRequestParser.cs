@@ -4,12 +4,12 @@ using Api.Contracts;
 
 namespace Api.Services.Validation;
 
-internal sealed class SemanticSearchRequestParser : ISemanticSearchRequestParser
+internal sealed class RagRequestParser : IRagRequestParser
 {
     public bool TryParseQueryRequest(
-        SemanticSearchQueryRequest request,
+        RagQueryRequest request,
         string defaultCollectionName,
-        [NotNullWhen(true)] out SemanticSearchQueryCommand? command,
+        [NotNullWhen(true)] out RagQueryCommand? command,
         out Dictionary<string, string[]> errors)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -23,10 +23,10 @@ internal sealed class SemanticSearchRequestParser : ISemanticSearchRequestParser
             errors["collection"] = ["Collection is required."];
         }
 
-        var queryText = request.QueryText?.Trim();
-        if (string.IsNullOrWhiteSpace(queryText))
+        var question = request.Question?.Trim();
+        if (string.IsNullOrWhiteSpace(question))
         {
-            errors["queryText"] = ["Query text is required."];
+            errors["question"] = ["Question is required."];
         }
 
         if (request.TopK <= 0)
@@ -39,14 +39,13 @@ internal sealed class SemanticSearchRequestParser : ISemanticSearchRequestParser
             return false;
         }
 
-        var resolvedQueryText = queryText!;
-
-        command = new SemanticSearchQueryCommand(
+        command = new RagQueryCommand(
             collectionName,
-            resolvedQueryText,
+            question!,
             request.TopK,
             request.MinScore,
-            SearchFilterRequestMapper.Map(request.Filter));
+            SearchFilterRequestMapper.Map(request.Filter),
+            request.IncludeDebug);
 
         return true;
     }

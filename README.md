@@ -44,12 +44,14 @@ dotnet run --project src/AppHost
 - `docs/tutorial/02-qdrant-basics.md`
 - `docs/tutorial/03-markdown-ingestion.md`
 - `docs/tutorial/04-semantic-search.md`
+- `docs/tutorial/05-rag-query.md`
 
 Recommended order:
 
 - Tutorial `02` uses manual 3-dimensional vectors.
 - Tutorials `03` and `04` use the embedding-based ingestion/search path with the configured embedding dimension (default: `384`).
 - Tutorial `04` builds directly on the ingestion flow from Tutorial `03`.
+- Tutorial `05` builds on the retrieval path from Tutorial `04` and adds grounded answer generation with citations.
 
 ## Verify Local Runtime
 

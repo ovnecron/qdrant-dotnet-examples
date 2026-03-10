@@ -1,12 +1,8 @@
 namespace Api.Contracts;
 
-public sealed record SemanticSearchQueryResponse
+public sealed record RagDebugResponse
 {
-    public required string TraceId { get; init; }
-
     public required string Collection { get; init; }
-
-    public required string QueryText { get; init; }
 
     public required string EmbeddingProvider { get; init; }
 
@@ -14,5 +10,9 @@ public sealed record SemanticSearchQueryResponse
 
     public required string EmbeddingSchemaVersion { get; init; }
 
-    public required IReadOnlyList<SemanticSearchHitResponse> Hits { get; init; }
+    public required string AnswerProvider { get; init; }
+
+    public required string AnswerModel { get; init; }
+
+    public required int RetrievedHitCount { get; init; }
 }

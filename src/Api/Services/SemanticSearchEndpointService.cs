@@ -3,13 +3,8 @@ using Api.Services.Mappers;
 using Api.Services.Results;
 using Api.Services.Validation;
 
-using Embeddings.Contracts;
-using Embeddings.Interfaces;
-
 using Microsoft.Extensions.Options;
 
-using VectorStore.Abstractions.Contracts;
-using VectorStore.Abstractions.Interfaces;
 using VectorStore.Qdrant.Options;
 
 namespace Api.Services;
@@ -17,24 +12,21 @@ namespace Api.Services;
 internal sealed class SemanticSearchEndpointService : ISemanticSearchEndpointService
 {
     private readonly string _defaultCollectionName;
-    private readonly ITextEmbeddingClient _embeddingClient;
     private readonly IServiceResultExecutor _resultExecutor;
     private readonly ISemanticSearchRequestParser _requestParser;
     private readonly ISemanticSearchResponseMapper _responseMapper;
-    private readonly IVectorStoreClient _vectorStoreClient;
+    private readonly ITextRetrievalService _textRetrievalService;
 
     public SemanticSearchEndpointService(
         IOptions<QdrantOptions> qdrantOptions,
-        ITextEmbeddingClient embeddingClient,
-        IVectorStoreClient vectorStoreClient,
+        ITextRetrievalService textRetrievalService,
         ISemanticSearchRequestParser requestParser,
         ISemanticSearchResponseMapper responseMapper,
         IServiceResultExecutor resultExecutor)
     {
         ArgumentNullException.ThrowIfNull(qdrantOptions);
         _defaultCollectionName = qdrantOptions.Value.Collection;
-        _embeddingClient = embeddingClient ?? throw new ArgumentNullException(nameof(embeddingClient));
-        _vectorStoreClient = vectorStoreClient ?? throw new ArgumentNullException(nameof(vectorStoreClient));
+        _textRetrievalService = textRetrievalService ?? throw new ArgumentNullException(nameof(textRetrievalService));
         _requestParser = requestParser ?? throw new ArgumentNullException(nameof(requestParser));
         _responseMapper = responseMapper ?? throw new ArgumentNullException(nameof(responseMapper));
         _resultExecutor = resultExecutor ?? throw new ArgumentNullException(nameof(resultExecutor));
@@ -57,31 +49,21 @@ internal sealed class SemanticSearchEndpointService : ISemanticSearchEndpointSer
         return await _resultExecutor.ExecuteAsync(
             async () =>
             {
-                var embedding = await _embeddingClient.EmbedAsync(
-                    new TextEmbeddingRequest
-                    {
-                        Text = command.QueryText,
-                        Kind = EmbeddingKind.Query
-                    },
+                var retrieval = await _textRetrievalService.RetrieveAsync(
+                    new TextRetrievalRequest(
+                        command.CollectionName,
+                        command.QueryText,
+                        command.TopK,
+                        command.MinScore,
+                        command.Filter),
                     cancellationToken);
-
-                var searchRequest = new SearchRequest
-                {
-                    CollectionName = command.CollectionName,
-                    QueryVector = embedding.Vector.ToArray(),
-                    TopK = command.TopK,
-                    MinScore = command.MinScore,
-                    Filter = command.Filter
-                };
-
-                var hits = await _vectorStoreClient.SearchAsync(searchRequest, cancellationToken);
 
                 return _responseMapper.ToQueryResponse(
                     traceId,
-                    command.CollectionName,
-                    command.QueryText,
-                    embedding.Descriptor,
-                    hits);
+                    retrieval.CollectionName,
+                    retrieval.QueryText,
+                    retrieval.Embedding,
+                    retrieval.Hits);
             },
             unexpectedTitle: "Semantic search failed");
     }

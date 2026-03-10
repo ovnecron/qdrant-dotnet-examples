@@ -37,6 +37,7 @@ internal static class ServiceResultMapper
     {
         var statusCode = failure.Kind switch
         {
+            ServiceFailureKind.InsufficientGrounding => StatusCodes.Status422UnprocessableEntity,
             ServiceFailureKind.NotFound => StatusCodes.Status404NotFound,
             ServiceFailureKind.VectorStoreUnavailable => StatusCodes.Status503ServiceUnavailable,
             ServiceFailureKind.ConfigurationInvalid => StatusCodes.Status503ServiceUnavailable,
