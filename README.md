@@ -1,17 +1,25 @@
-# Qdrant + .NET 10 RAG Starter
+# Qdrant .NET Examples
 
 [![CI](https://github.com/ovnecron/qdrant-dotnet-examples/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ovnecron/qdrant-dotnet-examples/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Qdrant](https://img.shields.io/badge/Qdrant-v1.17.0-EA2845)](https://qdrant.tech/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Starter repository for a Qdrant-backed .NET 10 RAG stack with local orchestration via Aspire.
+A growing collection of practical Qdrant examples for .NET developers.
 
-## Prerequisites
+This repo shows how to use Qdrant with C# and .NET for vector search, semantic search, RAG, anomaly detection, and other real-world application patterns.
 
-- .NET SDK 10.x
-- Docker Desktop (or compatible container runtime)
-- Git
+The focus is on small, runnable examples that are easy to understand, adapt, and build on.
+
+This repository is intentionally not limited to RAG. It aims to document practical Qdrant usage in .NET across multiple application patterns over time.
+
+## Examples
+
+- **Qdrant basics** - create collections, store vectors, and run similarity search
+- **Markdown ingestion** - turn markdown content into searchable vectors
+- **Semantic search** - retrieve relevant content with embeddings
+- **Grounded RAG** - generate answers from retrieved context with citations
+- **Anomaly detection** - score unusual vectors using nearest-neighbor patterns
 
 ## Quickstart (5-10 minutes)
 
@@ -38,6 +46,12 @@ Start the local stack (AppHost + API + Qdrant):
 dotnet run --project src/AppHost
 ```
 
+## Prerequisites
+
+- .NET SDK 10.x
+- Docker Desktop (or compatible container runtime)
+- Git
+
 ## Tutorials
 
 - `docs/tutorial/01-local-run.md`
@@ -45,6 +59,7 @@ dotnet run --project src/AppHost
 - `docs/tutorial/03-markdown-ingestion.md`
 - `docs/tutorial/04-semantic-search.md`
 - `docs/tutorial/05-rag-query.md`
+- `docs/tutorial/06-anomaly-detection.md`
 
 Recommended order:
 
@@ -52,6 +67,7 @@ Recommended order:
 - Tutorials `03` and `04` use the embedding-based ingestion/search path with the configured embedding dimension (default: `384`).
 - Tutorial `04` builds directly on the ingestion flow from Tutorial `03`.
 - Tutorial `05` builds on the retrieval path from Tutorial `04` and adds grounded answer generation with citations.
+- Tutorial `06` returns to direct vector inputs and demonstrates the anomaly-detection foundation that later text, image, and event/fraud slices can reuse.
 
 ## Verify Local Runtime
 

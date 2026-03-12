@@ -1,5 +1,6 @@
 @Api_HostAddress = http://localhost:5010
 @IngestCollection = knowledge_chunks_ingest
+@AnomalyCollection = anomaly_vectors
 @IngestJobId = replace-me
 
 GET {{Api_HostAddress}}/health
@@ -137,6 +138,76 @@ Content-Type: application/json
   "filter": {
     "tenantIdEquals": "tenant-a",
     "tagsAny": ["local"]
+  }
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/admin/collections/init
+Content-Type: application/json
+
+{
+  "collectionName": "{{AnomalyCollection}}",
+  "vectorSize": 3,
+  "distance": "Cosine"
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/vectors/upsert
+Content-Type: application/json
+
+{
+  "collection": "{{AnomalyCollection}}",
+  "points": [
+    {
+      "id": "baseline-1",
+      "vector": [1.0, 0.0, 0.0],
+      "payload": {
+        "docId": "acct-42",
+        "source": "fixtures/anomaly-baseline.json",
+        "tags": ["baseline", "normal"],
+        "content": "Baseline anomaly reference point.",
+        "tenantId": "tenant-a"
+      }
+    },
+    {
+      "id": "baseline-2",
+      "vector": [0.99, 0.01, 0.0],
+      "payload": {
+        "docId": "acct-42",
+        "source": "fixtures/anomaly-baseline.json",
+        "tags": ["baseline", "normal"],
+        "content": "Baseline anomaly reference point.",
+        "tenantId": "tenant-a"
+      }
+    },
+    {
+      "id": "baseline-3",
+      "vector": [0.97, 0.03, 0.0],
+      "payload": {
+        "docId": "acct-42",
+        "source": "fixtures/anomaly-baseline.json",
+        "tags": ["baseline", "normal"],
+        "content": "Baseline anomaly reference point.",
+        "tenantId": "tenant-a"
+      }
+    }
+  ]
+}
+
+###
+
+POST {{Api_HostAddress}}/api/v1/anomaly/score
+Content-Type: application/json
+
+{
+  "collection": "{{AnomalyCollection}}",
+  "vector": [0.98, 0.02, 0.0],
+  "topK": 3,
+  "threshold": 0.35,
+  "filter": {
+    "tenantIdEquals": "tenant-a"
   }
 }
 
