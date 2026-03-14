@@ -96,7 +96,7 @@ public sealed class MarkdownIngestionProcessorTests
         var embeddingOptions = Options.Create(
             new EmbeddingOptions
             {
-                Provider = DeterministicTextEmbeddingClient.ProviderName,
+                Provider = EmbeddingProvider.Deterministic,
                 Model = "hashing-text-v1",
                 Dimension = 16,
                 BatchSize = 8,

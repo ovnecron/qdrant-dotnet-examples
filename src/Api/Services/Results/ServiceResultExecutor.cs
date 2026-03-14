@@ -84,6 +84,8 @@ internal sealed class ServiceResultExecutor : IServiceResultExecutor
     {
         return exception switch
         {
+            ServiceFailureException serviceFailureException =>
+                ServiceResult<TValue>.Failed(serviceFailureException.Failure),
             RpcException rpcException when rpcException.StatusCode is StatusCode.Unavailable or StatusCode.DeadlineExceeded =>
                 ServiceResult<TValue>.Failed(
                     new ServiceFailure(

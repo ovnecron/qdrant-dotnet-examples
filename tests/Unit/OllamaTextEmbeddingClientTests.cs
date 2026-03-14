@@ -42,7 +42,7 @@ public sealed class OllamaTextEmbeddingClientTests
                 }),
             new EmbeddingOptions
             {
-                Provider = "Ollama",
+                Provider = EmbeddingProvider.Ollama,
                 Model = "embeddinggemma",
                 Dimension = 3,
                 BatchSize = 8,
@@ -98,7 +98,7 @@ public sealed class OllamaTextEmbeddingClientTests
                     })),
             new EmbeddingOptions
             {
-                Provider = "Ollama",
+                Provider = EmbeddingProvider.Ollama,
                 Model = "embeddinggemma",
                 Dimension = 3,
                 BatchSize = 8,
@@ -137,7 +137,7 @@ public sealed class OllamaTextEmbeddingClientTests
                     })),
             new EmbeddingOptions
             {
-                Provider = "Ollama",
+                Provider = EmbeddingProvider.Ollama,
                 Model = "embeddinggemma",
                 Dimension = 3,
                 BatchSize = 8,
@@ -161,7 +161,7 @@ public sealed class OllamaTextEmbeddingClientTests
     {
         var httpClient = new HttpClient(handler)
         {
-            BaseAddress = OllamaTextEmbeddingClient.ResolveBaseAddress(options.BaseUrl)
+            BaseAddress = OllamaHttpClientConfiguration.ResolveBaseAddress(options.BaseUrl)
         };
 
         return new OllamaTextEmbeddingClient(httpClient, Options.Create(options));

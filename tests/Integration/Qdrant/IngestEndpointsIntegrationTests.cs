@@ -298,7 +298,7 @@ public sealed class IngestEndpointsIntegrationTests
             Options.Create(
                 new EmbeddingOptions
                 {
-                    Provider = DeterministicTextEmbeddingClient.ProviderName,
+                    Provider = EmbeddingProvider.Deterministic,
                     Model = "hashing-text-v1",
                     Dimension = 384,
                     BatchSize = 16,

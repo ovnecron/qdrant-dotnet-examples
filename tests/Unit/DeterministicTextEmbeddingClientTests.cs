@@ -76,7 +76,7 @@ public sealed class DeterministicTextEmbeddingClientTests
         var client = CreateClient(
             new EmbeddingOptions
             {
-                Provider = "Mock",
+                Provider = EmbeddingProvider.Deterministic,
                 Model = "hashing-text-v2",
                 Dimension = 256,
                 BatchSize = 8,
@@ -135,7 +135,7 @@ public sealed class DeterministicTextEmbeddingClientTests
             Options.Create(
                 options ?? new EmbeddingOptions
                 {
-                    Provider = "Deterministic",
+                    Provider = EmbeddingProvider.Deterministic,
                     Model = "hashing-text-v1",
                     Dimension = 384,
                     BatchSize = 16,

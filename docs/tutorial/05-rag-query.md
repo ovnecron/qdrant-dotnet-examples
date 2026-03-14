@@ -126,5 +126,29 @@ Expected:
 
 - The retrieval path reuses the same configured embedding provider as Tutorial 04.
 - Default local runs use deterministic answer generation to keep the workflow reproducible for local runs, tests, and CI.
+- The answer provider is selected through configuration, not through the request payload.
+- If `Rag:AnswerProvider` is set to `Ollama`, the same `POST /api/v1/rag/query` endpoint uses Ollama's `/api/generate` endpoint for answer generation.
+- If `Rag:AnswerProvider=Ollama` and Ollama is unavailable or misconfigured, `rag/query` returns `503 Service Unavailable` instead of silently falling back to deterministic answers.
 - The response is still grounded by retrieved Qdrant evidence because citations come from the assembled retrieval context, not from the answer generator.
 - This first RAG slice runs entirely inside the API process. A separate Agent/worker host can be extracted later if the workflow grows enough to justify it.
+
+## Optional: Switch Answer Generation to Local Ollama
+
+Pull a local Ollama model first:
+
+```bash
+ollama pull <your-ollama-answer-model>
+```
+
+Then configure the API:
+
+```bash
+dotnet user-secrets set --project src/Api "Rag:AnswerProvider" "Ollama"
+dotnet user-secrets set --project src/Api "Rag:AnswerModel" "<your-ollama-answer-model>"
+dotnet user-secrets set --project src/Api "Rag:BaseUrl" "http://localhost:11434/api"
+```
+
+After restarting `src/AppHost`, the same `rag/query` request will return:
+
+- `answerProvider: "Ollama"` in `debug`
+- `answerModel` set to the configured Ollama model

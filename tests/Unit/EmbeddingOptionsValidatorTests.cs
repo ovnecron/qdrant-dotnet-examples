@@ -15,7 +15,7 @@ public sealed class EmbeddingOptionsValidatorTests
             name: null,
             new EmbeddingOptions
             {
-                Provider = "Deterministic",
+                Provider = EmbeddingProvider.Deterministic,
                 Model = "hashing-text-v1",
                 Dimension = 384,
                 BatchSize = 16,
@@ -33,7 +33,7 @@ public sealed class EmbeddingOptionsValidatorTests
             name: null,
             new EmbeddingOptions
             {
-                Provider = "Ollama",
+                Provider = EmbeddingProvider.Ollama,
                 Model = "embeddinggemma",
                 Dimension = 768,
                 BatchSize = 8,
@@ -52,7 +52,7 @@ public sealed class EmbeddingOptionsValidatorTests
             name: null,
             new EmbeddingOptions
             {
-                Provider = "Ollama",
+                Provider = EmbeddingProvider.Ollama,
                 Model = "embeddinggemma",
                 Dimension = 768,
                 BatchSize = 8,
@@ -66,14 +66,14 @@ public sealed class EmbeddingOptionsValidatorTests
     }
 
     [Fact]
-    public void Validate_FailsForUnsupportedProvider()
+    public void Validate_FailsForUnsupportedProviderValue()
     {
         var validator = new EmbeddingOptionsValidator();
         var result = validator.Validate(
             name: null,
             new EmbeddingOptions
             {
-                Provider = "Unsupported",
+                Provider = (EmbeddingProvider)999,
                 Model = "model",
                 Dimension = 10,
                 BatchSize = 1,

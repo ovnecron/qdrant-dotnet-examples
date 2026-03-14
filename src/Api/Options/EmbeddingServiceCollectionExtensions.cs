@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-
 using Embeddings.Clients;
 using Embeddings.Interfaces;
 using Embeddings.Options;
@@ -19,20 +17,7 @@ internal static class EmbeddingServiceCollectionExtensions
             (serviceProvider, httpClient) =>
             {
                 var options = serviceProvider.GetRequiredService<IOptions<EmbeddingOptions>>().Value;
-
-                httpClient.BaseAddress = OllamaTextEmbeddingClient.ResolveBaseAddress(options.BaseUrl);
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                if (string.IsNullOrWhiteSpace(options.ApiKey))
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = null;
-                    return;
-                }
-
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    "Bearer",
-                    options.ApiKey.Trim());
+                OllamaHttpClientConfiguration.ConfigureJsonApiClient(httpClient, options.BaseUrl, options.ApiKey);
             });
 
         services.AddTransient<ITextEmbeddingClient>(
@@ -40,17 +25,12 @@ internal static class EmbeddingServiceCollectionExtensions
             {
                 var options = serviceProvider.GetRequiredService<IOptions<EmbeddingOptions>>().Value;
 
-                if (DeterministicTextEmbeddingClient.SupportsProvider(options.Provider))
+                return options.Provider switch
                 {
-                    return serviceProvider.GetRequiredService<DeterministicTextEmbeddingClient>();
-                }
-
-                if (OllamaTextEmbeddingClient.SupportsProvider(options.Provider))
-                {
-                    return serviceProvider.GetRequiredService<OllamaTextEmbeddingClient>();
-                }
-
-                throw new InvalidOperationException($"Unsupported embedding provider '{options.Provider}'.");
+                    EmbeddingProvider.Deterministic => serviceProvider.GetRequiredService<DeterministicTextEmbeddingClient>(),
+                    EmbeddingProvider.Ollama => serviceProvider.GetRequiredService<OllamaTextEmbeddingClient>(),
+                    _ => throw new InvalidOperationException($"Unsupported embedding provider '{options.Provider}'.")
+                };
             });
 
         return services;

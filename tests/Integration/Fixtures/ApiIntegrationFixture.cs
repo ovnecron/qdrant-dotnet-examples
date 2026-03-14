@@ -37,7 +37,9 @@ public sealed class ApiIntegrationFixture : IAsyncLifetime
         var configuration = new Dictionary<string, string?>
         {
             ["Qdrant:EndpointRest"] = restEndpoint,
-            ["Qdrant:EndpointGrpc"] = grpcEndpoint
+            ["Qdrant:EndpointGrpc"] = grpcEndpoint,
+            ["Embedding:Provider"] = "Deterministic",
+            ["Rag:AnswerProvider"] = "Deterministic"
         };
 
         _apiFactory = new ApiWebApplicationFactory(configuration);

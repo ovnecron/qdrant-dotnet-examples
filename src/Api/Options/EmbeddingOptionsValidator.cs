@@ -13,16 +13,9 @@ public sealed class EmbeddingOptionsValidator : IValidateOptions<EmbeddingOption
         ArgumentNullException.ThrowIfNull(options);
 
         var failures = new List<string>();
-        var provider = options.Provider?.Trim() ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(provider))
+        if (!Enum.IsDefined(options.Provider))
         {
-            failures.Add("Embedding:Provider must be provided.");
-        }
-        else if (!DeterministicTextEmbeddingClient.SupportsProvider(provider) &&
-                 !OllamaTextEmbeddingClient.SupportsProvider(provider))
-        {
-            failures.Add("Embedding:Provider must be one of: Deterministic, Mock, Ollama.");
+            failures.Add("Embedding:Provider must be one of: Deterministic, Ollama.");
         }
 
         if (string.IsNullOrWhiteSpace(options.Model))
@@ -45,7 +38,7 @@ public sealed class EmbeddingOptionsValidator : IValidateOptions<EmbeddingOption
             failures.Add("Embedding:SchemaVersion must be provided.");
         }
 
-        if (OllamaTextEmbeddingClient.SupportsProvider(provider) &&
+        if (options.Provider == EmbeddingProvider.Ollama &&
             !IsValidHttpBaseUrl(options.BaseUrl))
         {
             failures.Add("Embedding:BaseUrl must be an absolute http/https URI for Ollama.");
@@ -58,12 +51,14 @@ public sealed class EmbeddingOptionsValidator : IValidateOptions<EmbeddingOption
 
     private static bool IsValidHttpBaseUrl(string? baseUrl)
     {
-        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri))
+        try
+        {
+            _ = OllamaHttpClientConfiguration.ResolveBaseAddress(baseUrl);
+            return true;
+        }
+        catch (InvalidOperationException)
         {
             return false;
         }
-
-        return uri.Scheme == Uri.UriSchemeHttp ||
-               uri.Scheme == Uri.UriSchemeHttps;
     }
 }

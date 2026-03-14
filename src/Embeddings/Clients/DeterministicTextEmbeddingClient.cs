@@ -13,7 +13,6 @@ namespace Embeddings.Clients;
 public sealed class DeterministicTextEmbeddingClient : ITextEmbeddingClient
 {
     public const string ProviderName = "Deterministic";
-    public const string LegacyProviderAlias = "Mock";
 
     private readonly EmbeddingDescriptor _descriptor;
 
@@ -54,17 +53,6 @@ public sealed class DeterministicTextEmbeddingClient : ITextEmbeddingClient
         }
 
         return Task.FromResult<IReadOnlyList<TextEmbeddingResult>>(results);
-    }
-
-    public static bool SupportsProvider(string? provider)
-    {
-        if (string.IsNullOrWhiteSpace(provider))
-        {
-            return false;
-        }
-
-        return provider.Equals(ProviderName, StringComparison.OrdinalIgnoreCase) ||
-               provider.Equals(LegacyProviderAlias, StringComparison.OrdinalIgnoreCase);
     }
 
     private TextEmbeddingResult EmbedCore(TextEmbeddingRequest request)

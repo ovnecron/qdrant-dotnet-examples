@@ -4,7 +4,7 @@ public sealed class EmbeddingOptions
 {
     public const string SectionName = "Embedding";
 
-    public string Provider { get; set; } = "Deterministic";
+    public EmbeddingProvider Provider { get; set; } = EmbeddingProvider.Deterministic;
 
     public string Model { get; set; } = "hashing-text-v1";
 

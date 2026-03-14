@@ -12,7 +12,6 @@ namespace Embeddings.Clients;
 public sealed class OllamaTextEmbeddingClient : ITextEmbeddingClient
 {
     public const string ProviderName = "Ollama";
-    public const string DefaultBaseUrl = "http://localhost:11434/api";
 
     private readonly EmbeddingDescriptor _descriptor;
     private readonly HttpClient _httpClient;
@@ -111,46 +110,6 @@ public sealed class OllamaTextEmbeddingClient : ITextEmbeddingClient
         }
 
         return results;
-    }
-
-    public static bool SupportsProvider(string? provider)
-    {
-        if (string.IsNullOrWhiteSpace(provider))
-        {
-            return false;
-        }
-
-        return provider.Equals(ProviderName, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public static Uri ResolveBaseAddress(string? baseUrl)
-    {
-        var rawBaseUrl = string.IsNullOrWhiteSpace(baseUrl) ? DefaultBaseUrl : baseUrl.Trim();
-
-        if (!Uri.TryCreate(rawBaseUrl, UriKind.Absolute, out var parsedUri))
-        {
-            throw new InvalidOperationException("Embedding:BaseUrl must be an absolute http/https URI.");
-        }
-
-        if (parsedUri.Scheme != Uri.UriSchemeHttp &&
-            parsedUri.Scheme != Uri.UriSchemeHttps)
-        {
-            throw new InvalidOperationException("Embedding:BaseUrl must use http or https.");
-        }
-
-        var builder = new UriBuilder(parsedUri);
-        if (string.IsNullOrWhiteSpace(builder.Path) || builder.Path == "/")
-        {
-            builder.Path = "/api/";
-            return builder.Uri;
-        }
-
-        if (!builder.Path.EndsWith("/", StringComparison.Ordinal))
-        {
-            builder.Path += "/";
-        }
-
-        return builder.Uri;
     }
 
     private static TextEmbeddingRequest NormalizeRequest(TextEmbeddingRequest request)

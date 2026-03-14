@@ -23,6 +23,7 @@ builder.Services.AddOpenApi("v1");
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IValidateOptions<EmbeddingOptions>, EmbeddingOptionsValidator>();
 builder.Services.AddSingleton<IValidateOptions<QdrantOptions>, QdrantOptionsValidator>();
+builder.Services.AddSingleton<IValidateOptions<RagOptions>, RagOptionsValidator>();
 builder.Services
     .AddOptions<EmbeddingOptions>()
     .Bind(builder.Configuration.GetSection(EmbeddingOptions.SectionName))
@@ -31,7 +32,12 @@ builder.Services
     .AddOptions<QdrantOptions>()
     .Bind(builder.Configuration.GetSection(QdrantOptions.SectionName))
     .ValidateOnStart();
+builder.Services
+    .AddOptions<RagOptions>()
+    .Bind(builder.Configuration.GetSection(RagOptions.SectionName))
+    .ValidateOnStart();
 builder.Services.AddConfiguredTextEmbeddingClient();
+builder.Services.AddConfiguredRagAnswerGenerator();
 builder.Services.AddQdrantVectorStore();
 builder.Services.AddSingleton<IAdminRequestParser, AdminRequestParser>();
 builder.Services.AddSingleton<IAnomalyRequestParser, AnomalyRequestParser>();
@@ -56,7 +62,6 @@ builder.Services.AddScoped<IAnomalyScoringCore, AnomalyScoringCore>();
 builder.Services.AddScoped<IAnomalyScoreCalculator, CosineAnomalyScoreCalculator>();
 builder.Services.AddScoped<IAnomalyEndpointService, AnomalyEndpointService>();
 builder.Services.AddScoped<IRagContextAssembler, RagContextAssembler>();
-builder.Services.AddScoped<IRagAnswerGenerator, DeterministicRagAnswerGenerator>();
 builder.Services.AddScoped<IRagEndpointService, RagEndpointService>();
 builder.Services.AddScoped<IMarkdownIngestionProcessor, MarkdownIngestionProcessor>();
 builder.Services.AddScoped<IIngestionEndpointService, IngestionEndpointService>();
