@@ -212,3 +212,19 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{Api_HostAddress}}/api/v1/anomaly/text/score
+Content-Type: application/json
+
+{
+  "collection": "{{IngestCollection}}",
+  "text": "Check the /health and /ready endpoints after startup.",
+  "topK": 1,
+  "threshold": 0.35,
+  "includeDebug": true,
+  "filter": {
+    "tenantIdEquals": "tenant-a"
+  }
+}
+
+###

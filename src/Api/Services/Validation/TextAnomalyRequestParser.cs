@@ -4,12 +4,12 @@ using Api.Contracts;
 
 namespace Api.Services.Validation;
 
-internal sealed class AnomalyRequestParser : IAnomalyRequestParser
+internal sealed class TextAnomalyRequestParser : ITextAnomalyRequestParser
 {
     public bool TryParseScoreRequest(
-        AnomalyScoreRequest request,
+        TextAnomalyScoreRequest request,
         string defaultCollectionName,
-        [NotNullWhen(true)] out AnomalyScoreCommand? command,
+        [NotNullWhen(true)] out TextAnomalyScoreCommand? command,
         out Dictionary<string, string[]> errors)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -23,10 +23,10 @@ internal sealed class AnomalyRequestParser : IAnomalyRequestParser
             errors["collection"] = ["Collection is required."];
         }
 
-        var vector = request.Vector;
-        if (vector.Count == 0)
+        var text = request.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(text))
         {
-            errors["vector"] = ["Vector must contain at least one value."];
+            errors["text"] = ["Text is required."];
         }
 
         if (request.TopK <= 0)
@@ -45,13 +45,14 @@ internal sealed class AnomalyRequestParser : IAnomalyRequestParser
             return false;
         }
 
-        command = new AnomalyScoreCommand(
+        command = new TextAnomalyScoreCommand(
             collectionName,
-            vector.ToArray(),
+            text!,
             request.TopK,
             threshold,
             SearchFilterRequestMapper.Map(request.Filter),
-            request.IncludeNeighbors);
+            request.IncludeNeighbors,
+            request.IncludeDebug);
 
         return true;
     }

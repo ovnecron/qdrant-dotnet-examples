@@ -60,6 +60,7 @@ dotnet run --project src/AppHost
 - `docs/tutorial/04-semantic-search.md`
 - `docs/tutorial/05-rag-query.md`
 - `docs/tutorial/06-anomaly-detection.md`
+- `docs/tutorial/07-text-anomaly-detection.md`
 
 Recommended order:
 
@@ -68,6 +69,7 @@ Recommended order:
 - Tutorial `04` builds directly on the ingestion flow from Tutorial `03`.
 - Tutorial `05` builds on the retrieval path from Tutorial `04` and adds grounded answer generation with citations.
 - Tutorial `06` returns to direct vector inputs and demonstrates the anomaly-detection foundation that later text, image, and event/fraud slices can reuse.
+- Tutorial `07` returns to the embedding-based path from Tutorial `03` and applies the anomaly core from Tutorial `06` to text.
 
 ## Verify Local Runtime
 
